@@ -68,7 +68,7 @@ int main()
         mongocxx::client* mClient;
     LOG
     try {
-        mClient = new mongocxx::client(mongocxx::uri{"mongodb://<>SeriKbeltR<>:><><S_EKkrikneltR<>TR>1926><@192.168.0.19:27018/?authSource=SERIKBELTR"});
+        mClient = new mongocxx::client(mongocxx::uri{""});
 
     } catch (mongocxx::exception &e) {
         std::cout << e.what() << "\n";
