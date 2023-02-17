@@ -48,7 +48,7 @@ public:
             {
                 T _item;
                 _item.setDocumentView(item);
-                __mlist.append (_item);
+                __mlist.push_back (_item);
             }
         }
         this->__onlist (__mlist);
@@ -65,7 +65,7 @@ public:
             {
                 T _item;
                 _item.setDocumentView(item);
-                __mlist.append (_item);
+                __mlist.push_back (_item);
             }
         }
         this->__onlist (__mlist);
@@ -88,7 +88,7 @@ public:
             {
                 T _item;
                 _item.setDocumentView(item);
-                __mlist.append (_item);
+                __mlist.push_back (_item);
             }
         }
         this->__onlist (__mlist);
@@ -129,7 +129,7 @@ public:
                 T _item;
                 _item.setDocumentView(item.view());
                 _item.setOid( result.value ().inserted_id ().get_oid ().value.to_string () );
-                __mlist.append (_item);
+                __mlist.push_back (_item);
                 return result.value ().inserted_id ().get_oid ().value.to_string ();
             }else{
                 return "";
@@ -209,7 +209,7 @@ public:
         return __skip/__limit;
     }
 
-    virtual void onList( const std::vector<T>  *mlist ) = 0;
+    virtual void onList( const std::vector<T>  &mlist ) = 0;
 
     const std::vector<T> &List() const
     {
@@ -232,7 +232,7 @@ public:
             {
                 T _item;
                 _item.setDocumentView(item);
-                __mlist.append (_item);
+                __mlist.push_back (_item);
             }
         }
         return __mlist;
@@ -247,7 +247,7 @@ private:
     std::vector<T> __mlist;
 
     void __onlist( std::vector<T> &mlist ){
-        this->onList (&mlist);
+        this->onList (mlist);
     }
 
     void replace( const T& item ){

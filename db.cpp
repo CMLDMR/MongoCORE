@@ -7,36 +7,31 @@
 #include <mongocxx/gridfs/uploader.hpp>
 #include <mongocxx/exception/gridfs_exception.hpp>
 #include <mongocxx/exception/bulk_write_exception.hpp>
-
+#include <mongocxx/pool.hpp>
+#include <mongocxx/instance.hpp>
 
 static int DBConnectionCount = 0;
 
 MongoCore::DB::DB()
 {
-    //    std::cout << "New Connect: Connection Count: " << ++DBConnectionCount << std::endl;
-    //    mConstructWithNewClient = true;
-    //    try {
-    //        mClient = new mongocxx::client(mongocxx::uri(_url));
-    //    } catch (mongocxx::exception &e) {
-    //        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-    //        std::cout << str << std::endl;
-    //    }
-    //    _mDB = mClient->database (DB__);
+
+
+
 }
 
-MongoCore::DB::DB(const DB &db)
-    :mDB(db.mDB)
-{
-    //    std::cout << "DB::DB(const DB &db): " << DBConnectionCount << std::endl;
-    mConstructWithNewClient = false;
-}
+//MongoCore::DB::DB(const DB &db)
+//    :mDB(db.mDB)
+//{
+//    //    std::cout << "DB::DB(const DB &db): " << DBConnectionCount << std::endl;
+//    mConstructWithNewClient = false;
+//}
 
-MongoCore::DB::DB(MongoCore::DB &&other)
-    :mDB(other.mDB)
-{
-    //    std::cout << "DB::DB(DB &&db): " << DBConnectionCount << std::endl;
-    mConstructWithNewClient = false;
-}
+//MongoCore::DB::DB(MongoCore::DB &&other)
+//    :mDB(other.mDB)
+//{
+//    //    std::cout << "DB::DB(DB &&db): " << DBConnectionCount << std::endl;
+//    mConstructWithNewClient = false;
+//}
 
 MongoCore::DB::DB(mongocxx::database *_db)
     :mDB( _db )
@@ -45,49 +40,54 @@ MongoCore::DB::DB(mongocxx::database *_db)
     mConstructWithNewClient = false;
 }
 
+void MongoCore::DB::instance(const std::string &mUri)
+{
+    mongocxx::instance{};
+}
+
 MongoCore::DB::DB(DB *_db) : mDB(_db->db ())
 {
     //    std::cout << "DB::DB(DB *_db): " << DBConnectionCount << std::endl;
     mConstructWithNewClient = false;
 }
 
-MongoCore::DB::DB(const DB *_db) : mDB( _db->getDB ()->mDB )
-{
+//MongoCore::DB::DB(const DB *_db) : mDB( _db->getDB ()->mDB )
+//{
 
-}
+//}
 
 
 
-MongoCore::DB::~DB()
-{
-    std::cout << "-DB Destructor- Delete Client: " << mConstructWithNewClient << std::endl;
-    if( mConstructWithNewClient )
-    {
-        std::cout << "Delete DB Connection, CurrentConnection Count: " <<  --DBConnectionCount << std::endl;
-    }
-    std::cout << "DB Destructor End" << std::endl;
-}
+//MongoCore::DB::~DB()
+//{
+//    std::cout << "-DB Destructor- Delete Client: " << mConstructWithNewClient << std::endl;
+//    if( mConstructWithNewClient )
+//    {
+//        std::cout << "Delete DB Connection, CurrentConnection Count: " <<  --DBConnectionCount << std::endl;
+//    }
+//    std::cout << "DB Destructor End" << std::endl;
+//}
 
-MongoCore::DB &MongoCore::DB::operator=(const DB &otherDB)
-{
-    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
-    mDB = otherDB.mDB;
-    return *this;
-}
+//MongoCore::DB &MongoCore::DB::operator=(const DB &otherDB)
+//{
+//    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
+//    mDB = otherDB.mDB;
+//    return *this;
+//}
 
-MongoCore::DB &MongoCore::DB::operator=(MongoCore::DB &&otherDB)
-{
-    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
-    mDB = otherDB.mDB;
-    return *this;
-}
+//MongoCore::DB &MongoCore::DB::operator=(MongoCore::DB &&otherDB)
+//{
+//    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
+//    mDB = otherDB.mDB;
+//    return *this;
+//}
 
-MongoCore::DB &MongoCore::DB::operator=(mongocxx::database *_db)
-{
-    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
-    mDB = _db;
-    return *this;
-}
+//MongoCore::DB &MongoCore::DB::operator=(mongocxx::database *_db)
+//{
+//    std::cout << "DB &DB::operator=(const DB &otherDB): " << DBConnectionCount << std::endl;
+//    mDB = _db;
+//    return *this;
+//}
 
 void MongoCore::DB::errorOccured(const std::string &errorText)
 {

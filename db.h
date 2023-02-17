@@ -13,6 +13,8 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include <mutex>
+#include <memory>
 
 #include "item.h"
 
@@ -26,16 +28,20 @@ class MONGOCORE_EXPORT DB
 {
 public:
     explicit DB();
-    DB( const DB &db);
-    DB( DB&& other );
+//    DB( const DB &db);
+//    DB( DB&& other );
     explicit DB( mongocxx::database* _db );
     explicit DB( DB* _db );
-    explicit DB( const DB* _db );
-    virtual ~DB();
+//    explicit DB( const DB* _db );
+//    virtual ~DB();
 
-    DB& operator=(const DB& otherDB);
-    DB& operator=( DB&& otherDB );
-    DB& operator=( mongocxx::database* _db );
+//    DB& operator=(const DB& otherDB);
+//    DB& operator=( DB&& otherDB );
+//    DB& operator=( mongocxx::database* _db );
+
+    static void instance( const std::string &mUri );
+
+
 
 
 
