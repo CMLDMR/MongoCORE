@@ -276,6 +276,71 @@ void MongoCore::Item::removeElement(const std::string_view &key)
     }
 }
 
+void MongoCore::Item::pushArray(std::string key, const Item &value)
+{
+    auto arr = bsoncxx::builder::basic::array{};
+    auto existArray = this->element (key);
+
+    if( existArray )
+    {
+        this->removeElement ( key );
+
+        for( auto item : existArray->view().get_array ().value )
+        {
+            try {
+                arr.append (item.get_value ());
+            } catch (bsoncxx::exception &e) {
+                std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+                errorOccured (str);
+            }
+        }
+    }
+
+    try {
+        arr.append (value.view ());
+    } catch (bsoncxx::exception &e) {
+        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+        errorOccured (str);
+    }
+
+    try {
+        mDoc.append (kvp(key,arr));
+    } catch (bsoncxx::exception &e) {
+        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+        errorOccured (str);
+    }
+}
+
+void MongoCore::Item::pullArray(const std::string &key, const bsoncxx::types::bson_value::value &value)
+{
+    auto arr = bsoncxx::builder::basic::array{};
+    auto existArray = this->element (key);
+
+    if( existArray )
+    {
+        this->removeElement ( key );
+        for( auto item : existArray->view().get_array ().value )
+        {
+            if( value != item.get_value ())
+            {
+                try {
+                    arr.append (item.get_value ());
+                } catch (bsoncxx::exception &e) {
+                    std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+                    errorOccured (str);
+                }
+            }
+        }
+    }
+
+    try {
+        mDoc.append (kvp(key,arr));
+    } catch (bsoncxx::exception &e) {
+        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+        errorOccured (str);
+    }
+}
+
 
 
 
@@ -400,5 +465,53 @@ MongoCore::Item MongoCore::FindOptions::projection() const
 
 
 
+
+
+template<>
+MongoCore::Item &MongoCore::Item::append(const std::string_view &key, const Item &value)
+{
+    this->removeElement (key);
+    try {
+        mDoc.append (bsoncxx::builder::basic::kvp(key,value.view ()));
+    } catch (bsoncxx::exception &e) {
+        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
+        errorOccured (str);
+    }
+    return *this;
+}
+
+
+
+
+
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::bson_value::value>(const std::string_view& ,const bsoncxx::types::bson_value::value&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_eod>(const std::string_view& ,const bsoncxx::types::b_eod&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_double>(const std::string_view& ,const bsoncxx::types::b_double&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_string>(const std::string_view& ,const bsoncxx::types::b_string&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_document>(const std::string_view& ,const bsoncxx::types::b_document&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_array>(const std::string_view& ,const bsoncxx::types::b_array&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_binary>(const std::string_view& ,const bsoncxx::types::b_binary&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_undefined>(const std::string_view& ,const bsoncxx::types::b_undefined&);
+
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_oid>(const std::string_view& ,const bsoncxx::types::b_oid&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_bool>(const std::string_view& ,const bsoncxx::types::b_bool&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_date>(const std::string_view& ,const bsoncxx::types::b_date&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_null>(const std::string_view& ,const bsoncxx::types::b_null&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_regex>(const std::string_view& ,const bsoncxx::types::b_regex&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_dbpointer>(const std::string_view& ,const bsoncxx::types::b_dbpointer&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_code>(const std::string_view& ,const bsoncxx::types::b_code&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_symbol>(const std::string_view& ,const bsoncxx::types::b_symbol&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_codewscope>(const std::string_view& ,const bsoncxx::types::b_codewscope&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_int32>(const std::string_view& ,const bsoncxx::types::b_int32&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_timestamp>(const std::string_view& ,const bsoncxx::types::b_timestamp&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_int64>(const std::string_view& ,const bsoncxx::types::b_int64&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_decimal128>(const std::string_view& ,const bsoncxx::types::b_decimal128&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_minkey>(const std::string_view& ,const bsoncxx::types::b_minkey&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::b_maxkey>(const std::string_view& ,const bsoncxx::types::b_maxkey&);
+//template MongoCore::Item &MongoCore::Item::append<bsoncxx::types::bson_value::view>(const std::string_view& ,const bsoncxx::types::bson_value::view&);
+
+//template MongoCore::Item &MongoCore::Item::append<int>(const std::string_view& ,const int&);
+//template MongoCore::Item &MongoCore::Item::append<double>(const std::string_view& ,const double&);
+//template MongoCore::Item &MongoCore::Item::append<std::string>(const std::string_view& ,const std::string&);
 
 

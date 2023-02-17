@@ -22,10 +22,6 @@
 
 namespace MongoCore {
 
-
-
-
-
 class MONGOCORE_EXPORT Item
 {
 public:
@@ -48,10 +44,6 @@ public:
     Item& operator=(const bsoncxx::document::view &view);
     MongoCore::Item& setDocumentView( const bsoncxx::document::view &view);
     bsoncxx::document::view view() const;
-
-
-
-
 
 
     std::optional<bsoncxx::types::bson_value::value> element(const std::string &key) const;
@@ -119,81 +111,16 @@ public:
     }
 
 
-//    template<Item>
-    void pushArray(std::string key ,const Item &value){
-        auto arr = bsoncxx::builder::basic::array{};
-        auto existArray = this->element (key);
-
-        if( existArray )
-        {
-            this->removeElement ( key );
-
-            for( auto item : existArray->view().get_array ().value )
-            {
-                try {
-                    arr.append (item.get_value ());
-                } catch (bsoncxx::exception &e) {
-                    std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-                    errorOccured (str);
-                }
-            }
-        }
-
-        try {
-            arr.append (value.view ());
-        } catch (bsoncxx::exception &e) {
-            std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-            errorOccured (str);
-        }
-
-        try {
-            mDoc.append (kvp(key,arr));
-        } catch (bsoncxx::exception &e) {
-            std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-            errorOccured (str);
-        }
-    }
+    void pushArray(std::string key ,const Item &value);
 
 
 
 
-    void pullArray( const std::string& key , const bsoncxx::types::bson_value::value &value )
-    {
-        auto arr = bsoncxx::builder::basic::array{};
-        auto existArray = this->element (key);
-
-        if( existArray )
-        {
-            this->removeElement ( key );
-            for( auto item : existArray->view().get_array ().value )
-            {
-                if( value != item.get_value ())
-                {
-                    try {
-                        arr.append (item.get_value ());
-                    } catch (bsoncxx::exception &e) {
-                        std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-                        errorOccured (str);
-                    }
-                }
-            }
-        }
-
-        try {
-            mDoc.append (kvp(key,arr));
-        } catch (bsoncxx::exception &e) {
-            std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-            errorOccured (str);
-        }
-
-    }
-
-
-
-
+    void pullArray( const std::string& key , const bsoncxx::types::bson_value::value &value );
 
     template<typename T>
     Item& append( const std::string_view &key ,const T &value ){
+
         this->removeElement (key);
         try {
             mDoc.append (bsoncxx::builder::basic::kvp(key,value));
@@ -204,26 +131,8 @@ public:
         return *this;
     }
 
-
-
-
     template<>
-    Item& append( const std::string_view &key ,const Item &value ){
-        this->removeElement (key);
-        try {
-            mDoc.append (bsoncxx::builder::basic::kvp(key,value.view ()));
-        } catch (bsoncxx::exception &e) {
-            std::string str = "ERROR: " + std::to_string(__LINE__) + " " + __FUNCTION__ + " " + e.what();
-            errorOccured (str);
-        }
-        return *this;
-    }
-
-
-
-
-
-
+    Item& append( const std::string_view &key ,const Item &value );
 
 private:
     bsoncxx::builder::basic::document mDoc;
