@@ -2,7 +2,9 @@
 #include "mongocore.h"
 
 
-MongoCore::MongoCore()
+MongoCore::MongoCore::MongoCore()
 {
+
+
 }
 
