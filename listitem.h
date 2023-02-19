@@ -269,7 +269,7 @@ private:
         {
             if( _item.oid().value().to_string() == item.oid().value().to_string() )
             {
-                __mlist.remove (index);
+                __mlist.erase (__mlist.begin()+index);
                 break;
             }
             index++;
