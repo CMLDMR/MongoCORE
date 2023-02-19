@@ -107,6 +107,51 @@ mongocxx::database *MongoCore::DB::db()
 
 std::string MongoCore::DB::downloadFile(const std::string &fileOid, bool forceFilename)
 {
+
+
+    std::string file__Name{""};
+    bool fileDownloadedBefore=true;
+
+    auto filter = bsoncxx::builder::basic::document{};
+
+    try {
+        filter.append(bsoncxx::builder::basic::kvp("_id",bsoncxx::oid{fileOid}));
+    } catch (bsoncxx::exception &e) {
+        std::cout << "\nLOG: " << e.what() << "\n";
+    }
+
+    auto val = this->mDB->collection("fs.files").find_one(filter.view());
+
+    if( val ){
+        std::filesystem::path file_info;
+        try {
+            file_info = std::filesystem::path(val.value().view()["filename"].get_string().value.data());
+        } catch (bsoncxx::exception &e) {
+            fileDownloadedBefore = false;
+        }
+        if( fileDownloadedBefore ){
+            if( forceFilename ){
+                file__Name = std::string("tempfile/")+file_info.stem().string()+file_info.extension().string();
+            }else{
+                file__Name = "tempfile/"+fileOid+file_info.extension().string();
+            }
+
+            if( std::filesystem::exists(file__Name) ){
+                std::cout << "\nFile Exist: " << file__Name << "\n";
+            }else{
+                std::cout << "\nFile NOT Exist: " << file__Name << "\n";
+                fileDownloadedBefore = false;
+            }
+        }
+    }else{
+        fileDownloadedBefore = false;
+    }
+
+    if( fileDownloadedBefore ){
+        return file__Name;
+    }
+
+
     auto bucket = this->db ()->gridfs_bucket ();
 
     auto doc = bsoncxx::builder::basic::document{};
@@ -213,9 +258,9 @@ std::string MongoCore::DB::downloadFileWeb(const std::string &fileOid, bool forc
         }
         if( fileDownloadedBefore ){
             if( forceFilename ){
-                file__Name = std::string("tempfile/")+file_info.stem().string()+"."+file_info.extension().string();
+                file__Name = std::string("tempfile/")+file_info.stem().string()+file_info.extension().string();
             }else{
-                file__Name = "tempfile/"+fileOid+"."+file_info.extension().string();
+                file__Name = "tempfile/"+fileOid+file_info.extension().string();
             }
 
             if( std::filesystem::exists(std::string("docroot/")+file__Name) ){
