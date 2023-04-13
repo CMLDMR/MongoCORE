@@ -256,7 +256,7 @@ private:
         {
             if( _item.oid().value().to_string() == item.oid().value().to_string() )
             {
-                __mlist.replace (index,item);
+                __mlist[index] = item;
                 break;
             }
             index++;
